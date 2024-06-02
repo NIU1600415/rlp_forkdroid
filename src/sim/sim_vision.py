@@ -16,3 +16,9 @@ class SimVision(Vision):
         # vision sensor image is vertically flipped, correct it.
         frame = flipud(frame)
         return frame
+
+    def detect_box(self):
+        return True, (1, 0, 0.2)
+
+    def detect_dest(self):
+        return True, (1, 0, 0.2)
