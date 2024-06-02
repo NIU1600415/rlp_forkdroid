@@ -10,10 +10,3 @@ class SimVision(Vision):
 
     def get_image(self, image):
         pass
-
-    def detect_box(self):
-        return True, (1,0,0.2)
-
-    def detect_dest(self):
-        return True, (1,0,0.2)
-    
