@@ -2,6 +2,7 @@ import time
 from lib.motion import Motion
 from lib.vision import Vision
 from client_messaging.client_messaging import ClientMessaging, MessageFromClient, CalibrationData
+from vision_processing.vision_processing import analyze_frame_for_target_object
 
 
 class StateMachine:
