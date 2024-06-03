@@ -1,16 +1,13 @@
+from typing import TypedDict
 import numpy as np
 import cv2
-from typing import TypedDict
 
 
-def masking_first_step(img_data):
+def masking_first_step(img_data, lower_hsv, upper_hsv):
     # Convert the image to HSV color space
     hsv = cv2.cvtColor(img_data, cv2.COLOR_BGR2HSV)
 
-    lower_red = np.array([150, 44, 80])
-    upper_red = np.array([185, 255, 255])
-
-    mask = cv2.inRange(hsv, lower_red, upper_red)
+    mask = cv2.inRange(hsv, lower_hsv, upper_hsv)
     return mask
 
 
@@ -241,6 +238,10 @@ class TargetAnalysisResult(TypedDict):
     """Target rotation in frame with respect to the observer, in degrees, between `-45` and `45`.
     If the target is perfectly facing the observer, this value is `0`. If it is facing right,
     the value is `-45`, left is `45`, and anything in between."""
+
+
+LOWER_RED_HSV = np.array([150, 44, 80])
+UPPER_RED_HSV = np.array([185, 255, 255])
 
 
 def analyze_frame_for_target_object(frame) -> TargetAnalysisResult:
