@@ -9,15 +9,11 @@ class SimMotion(Motion):
         """Requires a reference to the client.simulator for CoppeliaSim"""
         self.sim = sim
         self.target_position = None
-        self.robot_handle = self.sim.getObject('/RobotnikSummitXL')
-        self.bl_handle = self.sim.getObject(
-            '/RobotnikSummitXL/back_left_wheel')
-        self.br_handle = self.sim.getObject(
-            '/RobotnikSummitXL/back_right_wheel')
-        self.fl_handle = self.sim.getObject(
-            '/RobotnikSummitXL/front_left_wheel')
-        self.fr_handle = self.sim.getObject(
-            '/RobotnikSummitXL/front_right_wheel')
+        self.robot_handle = self.sim.getObject("/RobotnikSummitXL")
+        self.bl_handle = self.sim.getObject("/RobotnikSummitXL/back_left_wheel")
+        self.br_handle = self.sim.getObject("/RobotnikSummitXL/back_right_wheel")
+        self.fl_handle = self.sim.getObject("/RobotnikSummitXL/front_left_wheel")
+        self.fr_handle = self.sim.getObject("/RobotnikSummitXL/front_right_wheel")
         self.max_velocity = 3.0  # Can be modified
 
     def move_forward(self, duration):
