@@ -1,4 +1,5 @@
 from lib.motion import Motion
+import time
 
 class SimMotion(Motion):
     def __init__(self, sim):
@@ -11,37 +12,45 @@ class SimMotion(Motion):
         self.fr_handle = self.sim.getObject('/RobotnikSummitXL/front_right_wheel')
         self.max_velocity = 3.0  # Can be modified
 
-    def set_target_position(self, position):
-        self.target_position = position
 
-    def get_current_position(self):
-        position = self.sim.getObjectPosition(self.robot_handle)
-        return position
-
-    '''I struggeld a bit cuz the right wheel joint is set weird'''
-    def move_forward(self):
+    '''The right wheel joint directions was set on the other way'''
+    def move_forward(self,duration):
         self.sim.setJointTargetVelocity(self.bl_handle, self.max_velocity)
         self.sim.setJointTargetVelocity(self.fl_handle, self.max_velocity)
         self.sim.setJointTargetVelocity(self.br_handle, -self.max_velocity)
         self.sim.setJointTargetVelocity(self.fr_handle, -self.max_velocity)
+        if duration:
+            time.sleep(duration)
+            self.stop()
 
-    def move_backward(self):
+    
+    def move_backward(self,duration):
         self.sim.setJointTargetVelocity(self.bl_handle, -self.max_velocity)
         self.sim.setJointTargetVelocity(self.fl_handle, -self.max_velocity)
         self.sim.setJointTargetVelocity(self.br_handle, self.max_velocity)
         self.sim.setJointTargetVelocity(self.fr_handle, self.max_velocity)
+        if duration:
+            time.sleep(duration)
+            self.stop()
 
-    def turn_left(self):
+    def turn_left(self, duration):
         self.sim.setJointTargetVelocity(self.bl_handle, -self.max_velocity)
         self.sim.setJointTargetVelocity(self.fl_handle, -self.max_velocity)
         self.sim.setJointTargetVelocity(self.br_handle, -self.max_velocity)
         self.sim.setJointTargetVelocity(self.fr_handle, -self.max_velocity)
+        if duration:
+            time.sleep(duration)
+            self.stop()
 
-    def turn_right(self):
+
+    def turn_right(self, duration):
         self.sim.setJointTargetVelocity(self.bl_handle, self.max_velocity)
         self.sim.setJointTargetVelocity(self.fl_handle, self.max_velocity)
         self.sim.setJointTargetVelocity(self.br_handle, self.max_velocity)
         self.sim.setJointTargetVelocity(self.fr_handle, self.max_velocity)
+        if duration:
+            time.sleep(duration)
+            self.stop()
 
     def stop(self):
         self.sim.setJointTargetVelocity(self.bl_handle, 0)
@@ -56,13 +65,4 @@ class SimMotion(Motion):
     def leave_box(self):
         pass
 
-    def is_arrived(self):
-        # current_position = self.get_current_position()
-        # if current_position is None or self.target_position is None:
-        #     return False
 
-        # threshold = 0.1 # This should be adjusted
-        # return (abs(current_position[0] - self.target_position[0]) < threshold and
-        #         abs(current_position[1] - self.target_position[1]) < threshold and
-        #         abs(current_position[2] - self.target_position[2]) < threshold)
-        return False

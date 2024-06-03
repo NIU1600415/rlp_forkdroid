@@ -9,10 +9,13 @@ class Vision(ABC):
     @abstractmethod
     def get_frame(self) -> npt.NDArray[uint8]:
         """Get an RGB image frame from vision sensor (camera). Returns numpy image data."""
+        raise NotImplementedError(
+            "This method should be overridden by subclasses")
 
     @abstractmethod
     def detect_box(self):
-        """Check if the robot has arrived to the target."""
+        raise NotImplementedError(
+            "This method should be overridden by subclasses")
 
     @abstractmethod
     def detect_dest(self):
