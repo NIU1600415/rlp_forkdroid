@@ -1,16 +1,13 @@
+from typing import TypedDict
 import numpy as np
 import cv2
-from typing import TypedDict
 
 
-def masking_first_step(img_data):
+def masking_first_step(img_data, lower_hsv, upper_hsv):
     # Convert the image to HSV color space
-    hsv = cv2.cvtColor(img_data, cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(img_data, cv2.COLOR_RGB2HSV)
 
-    lower_red = np.array([150, 44, 80])
-    upper_red = np.array([185, 255, 255])
-
-    mask = cv2.inRange(hsv, lower_red, upper_red)
+    mask = cv2.inRange(hsv, lower_hsv, upper_hsv)
     return mask
 
 
@@ -82,15 +79,7 @@ def get_mask_frame_fourth_step(final_mask):
     return True, ((x_new, y_new), (x_new + w_new, y_new + h_new)), (x_center, y_center)
 
 
-def get_lateral_position_offset_fifth_step(target_center_xy, frame):
-    width = frame.shape[1]
-    x = target_center_xy[0]
-    min_x, max_x = (-1, 1)
-    lateral_pos_offset = x * (max_x - min_x) / width + min_x
-    return lateral_pos_offset
-
-
-def should_continue_given_relative_frame_size_sixth_step(full_image, target_xy_1, target_xy_2):
+def should_continue_given_relative_frame_size_fifth_step(full_image, target_xy_1, target_xy_2):
     # if target frame is 50% or more of image size in pixels, don't continue
     percentage_threshold = 50
 
@@ -105,12 +94,19 @@ def should_continue_given_relative_frame_size_sixth_step(full_image, target_xy_1
     return (percentage_covered_by_frame < percentage_threshold, percentage_covered_by_frame)
 
 
-def get_distance_seventh_step(mask):
-    MAGIC_NUMBER = 14.2
+def get_lateral_position_offset_sixth_step(target_center_xy, frame):
+    width = frame.shape[1]
+    x = target_center_xy[0]
+    min_x, max_x = (-1, 1)
+    lateral_pos_offset = x * (max_x - min_x) / width + min_x
+    return lateral_pos_offset
+
+
+def get_distance_seventh_step(mask, magic_number):
     total_pixels = mask.shape[0] * mask.shape[1]
     non_zero_pixels = cv2.countNonZero(mask)
     percentage = (non_zero_pixels / total_pixels) * 100
-    return percentage * MAGIC_NUMBER
+    return magic_number / percentage
 
 
 def get_contour_from_mask_seventh_step(mask):
@@ -220,9 +216,27 @@ def get_rotation_from_contour_facing_ninth_step(contour_vertices, facing):
     return final_rot
 
 
+def write_debug_frame(frame, outline_positions, data_text_lines):
+    debug_frame = frame.copy()
+    xy_1, xy_2 = outline_positions
+    cv2.rectangle(debug_frame, xy_1, xy_2, color=(0, 230, 0), thickness=2)
+    for i, line in enumerate(data_text_lines):
+        cv2.putText(
+            debug_frame,
+            line,
+            (10, 26 + i * 32),
+            cv2.FONT_HERSHEY_DUPLEX,
+            0.8,
+            (0, 255, 255),
+            2,
+            2,
+        )
+    cv2.imwrite("debug.jpg", cv2.cvtColor(debug_frame, cv2.COLOR_BGR2RGB))
+
+
 class TargetAnalysisResult(TypedDict):
     target_detected: bool
-    """True if target was detected, otherwise false, and analysis values can be ignored."""
+    """True if target was detected, otherwise False, and analysis values can be ignored."""
 
     target_size_percentage: float
     """Percentage of frame pixels that the target occupies"""
@@ -234,8 +248,8 @@ class TargetAnalysisResult(TypedDict):
     """Target distance from observer, measured in cm."""
 
     target_frame_lateral_position_offset: float
-    """How far from frame center the target is, between `-1` and `1`. `0` represents the center of the frame,
-    `-1` is the left-most position, and `1` is the right-most position."""
+    """How far from frame center the target is, between `-1` and `1`. `0` represents the center
+    of the frame, `-1` is the left-most position, and `1` is the right-most position."""
 
     target_rotation: float
     """Target rotation in frame with respect to the observer, in degrees, between `-45` and `45`.
@@ -243,14 +257,21 @@ class TargetAnalysisResult(TypedDict):
     the value is `-45`, left is `45`, and anything in between."""
 
 
-def analyze_frame_for_target_object(frame) -> TargetAnalysisResult:
+LOWER_RED_HSV = np.array([150, 44, 80])
+UPPER_RED_HSV = np.array([185, 255, 255])
+TARGET_DIST_MAGIC_NUMBER = 100
+
+
+def analyze_frame_for_target_object(frame, debug=False) -> TargetAnalysisResult:
     """Analyzes an image frame for a target object and calculates its parameters"""
-    mask = masking_first_step(frame)
+    mask = masking_first_step(frame, LOWER_RED_HSV, UPPER_RED_HSV)
     clean_mask = clean_mask_second_step(mask)
     final_mask = remove_unconnected_components_third_step(clean_mask)
     found_frame, target_frame, frame_center_xy = get_mask_frame_fourth_step(
         final_mask)
     if not found_frame:
+        if debug:
+            write_debug_frame(frame, target_frame, ["Looking for target"])
         return {
             "target_detected": False,
             "target_size_percentage": 0,
@@ -260,9 +281,11 @@ def analyze_frame_for_target_object(frame) -> TargetAnalysisResult:
             "target_distance": 0
         }
     target_xy_1, target_xy_2 = target_frame
-    should_continue, size_percentage = should_continue_given_relative_frame_size_sixth_step(
+    should_continue, size_percentage = should_continue_given_relative_frame_size_fifth_step(
         frame, target_xy_1, target_xy_2)
     if not should_continue:
+        if debug:
+            write_debug_frame(frame, target_frame, ["Target too large"])
         return {
             "target_detected": True,
             "target_size_percentage": size_percentage,
@@ -271,13 +294,20 @@ def analyze_frame_for_target_object(frame) -> TargetAnalysisResult:
             "target_rotation": 0,
             "target_distance": 0
         }
-    target_lateral_offset = get_lateral_position_offset_fifth_step(
-        frame_center_xy, frame)
-    target_distance = get_distance_seventh_step(final_mask)
+    target_lateral_offset = get_lateral_position_offset_sixth_step(
+        frame_center_xy, frame
+    )
+    target_distance = get_distance_seventh_step(
+        final_mask, TARGET_DIST_MAGIC_NUMBER)
     target_contour = get_contour_from_mask_seventh_step(final_mask)
     target_facing = get_facing_from_contour_eighth_step(target_contour)
     target_rotation = get_rotation_from_contour_facing_ninth_step(
         target_contour, target_facing)
+    if debug:
+        write_debug_frame(frame, target_frame, [f"Distance: {target_distance:.2f}cm",
+                                                f"Rotation: {
+                                                    target_rotation:.2f}deg",
+                                                f"Center offset: {target_lateral_offset:.2f}"])
     return {
         "target_detected": True,
         "target_size_percentage": size_percentage,
@@ -285,4 +315,53 @@ def analyze_frame_for_target_object(frame) -> TargetAnalysisResult:
         "target_frame_lateral_position_offset": target_lateral_offset,
         "target_rotation": target_rotation,
         "target_distance": target_distance,
+    }
+
+
+class DestinationAnalysisResult(TypedDict):
+    destination_detected: bool
+    """True if destination was detected, otherwise False, and analysis values can be ignored."""
+
+    destination_distance: float
+    """Destination distance from observer, measured in cm."""
+
+    destination_frame_lateral_position_offset: float
+    """How far from frame center the destination is, between `-1` and `1`. `0` represents the center
+    of the frame, `-1` is the left-most position, and `1` is the right-most position."""
+
+
+LOWER_YELLOW_HSV = np.array([10, 100, 100])
+UPPER_YELLOW_HSV = np.array([45, 255, 255])
+DESTINATION_DIST_MAGIC_NUMBER = 71
+
+
+def analyze_frame_for_destination(frame, debug=False) -> DestinationAnalysisResult:
+    """Analyzes an image frame for a destination position and calculates its parameters"""
+    mask = masking_first_step(frame, LOWER_YELLOW_HSV, UPPER_YELLOW_HSV)
+    clean_mask = clean_mask_second_step(mask)
+    final_mask = remove_unconnected_components_third_step(clean_mask)
+    found_frame, target_frame, frame_center_xy = get_mask_frame_fourth_step(
+        final_mask)
+    if not found_frame:
+        if debug:
+            write_debug_frame(frame, target_frame, ["Looking for destination"])
+        return {
+            "destination_detected": False,
+            "destination_distance": 0,
+            "destination_frame_lateral_position_offset": 0,
+        }
+    destionation_lateral_offset = get_lateral_position_offset_sixth_step(
+        frame_center_xy, frame)
+    destination_distance = get_distance_seventh_step(final_mask, DESTINATION_DIST_MAGIC_NUMBER)
+    if debug:
+        write_debug_frame(
+            frame,
+            target_frame,
+            [f"Destination distance: {destination_distance:.2f}cm",
+             f"Center offset: {destionation_lateral_offset:.2f}"],
+        )
+    return {
+        "destination_detected": True,
+        "destination_distance": destination_distance,
+        "destination_frame_lateral_position_offset": destionation_lateral_offset,
     }
