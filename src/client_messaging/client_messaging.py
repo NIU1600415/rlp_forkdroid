@@ -38,7 +38,5 @@ class ClientMessaging:
         return self.available_messages.pop(0)
 
     def send(self, message: MessageToClient):
-        r = requests.post(f"{self.endpoint}/queue/incoming",
-                          json=message)
-        print(
-            f"STATEMACHINE sent message: {message}", r.request.body, r.status_code)
+        r = requests.post(f"{self.endpoint}/queue/incoming", json=message)
+        print(f"STATEMACHINE sent message: {message}", r.request.body, r.status_code)

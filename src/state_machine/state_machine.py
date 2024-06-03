@@ -1,12 +1,21 @@
 import time
 from lib.motion import Motion
 from lib.vision import Vision
-from client_messaging.client_messaging import ClientMessaging, MessageFromClient, CalibrationData
-from vision_processing.vision_processing import analyze_frame_for_target_object, analyze_frame_for_destination
+from client_messaging.client_messaging import (
+    ClientMessaging,
+    MessageFromClient,
+    CalibrationData,
+)
+from vision_processing.vision_processing import (
+    analyze_frame_for_target_object,
+    analyze_frame_for_destination,
+)
 
 
 class StateMachine:
-    def __init__(self, client_messaging: ClientMessaging, motion: Motion, vision: Vision):
+    def __init__(
+        self, client_messaging: ClientMessaging, motion: Motion, vision: Vision
+    ):
         self.client_messaging = client_messaging
         self.motion = motion
         self.vision = vision
@@ -39,24 +48,22 @@ class StateMachine:
     def calibrate_target(self):
         print("CALIBRATE TARGET")
         time.sleep(1)
-        self.client_messaging.send({
-            "type": "CALIB_DATA_TARGET",
-            "data": {
-                "upper": "#FEFEFE",
-                "lower": "#FEFEFE"
+        self.client_messaging.send(
+            {
+                "type": "CALIB_DATA_TARGET",
+                "data": {"upper": "#FEFEFE", "lower": "#FEFEFE"},
             }
-        })
+        )
 
     def calibrate_destination(self):
         print("CALIBRATE DEST")
         time.sleep(1)
-        self.client_messaging.send({
-            "type": "CALIB_DATA_DESTINATION",
-            "data": {
-                "upper": "#FEFEFE",
-                "lower": "#FEFEFE"
+        self.client_messaging.send(
+            {
+                "type": "CALIB_DATA_DESTINATION",
+                "data": {"upper": "#FEFEFE", "lower": "#FEFEFE"},
             }
-        })
+        )
 
     def idle(self):
         print("IDLE state")
