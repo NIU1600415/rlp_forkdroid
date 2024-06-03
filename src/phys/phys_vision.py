@@ -7,5 +7,5 @@ class PhysVision(Vision):
     def __init__(self):
         """TODO"""
 
-    def get_image(self, image):
+    def get_frame(self):
         pass
