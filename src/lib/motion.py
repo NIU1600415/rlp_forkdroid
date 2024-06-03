@@ -33,3 +33,15 @@ class Motion(ABC):
         """Stop the robot's movement."""
         raise NotImplementedError(
             "This method should be overridden by subclasses")
+
+    @abstractmethod
+    def lift_box(self):
+        """Lift the box."""
+        raise NotImplementedError(
+            "This method should be overridden by subclasses")
+
+    @abstractmethod
+    def leave_box(self):
+        """Leave the box at the destination."""
+        raise NotImplementedError(
+            "This method should be overridden by subclasses")
