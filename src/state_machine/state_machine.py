@@ -13,7 +13,7 @@ class StateMachine:
 
         # State
         self.state = "IDLE"
-        self.isArrived = 0
+        self.is_arrived = 0
         self.calibrated: bool = False
         self.calibration_target: CalibrationData
         self.calibration_dest: CalibrationData
@@ -60,20 +60,20 @@ class StateMachine:
 
     def idle(self):
         print("IDLE state")
-        self.isArrived = 0
-        self.state = "Detect Box"
+        self.is_arrived = 0
+        self.state = "DETECT_BOX"
 
     def detect_box(self):
-        print("Detect Box state")
+        print("DETECT_BOX state")
         box_detected, box_distance, box_angle = self.vision.detect_box()
         if box_detected:
-            self.state = "Move to Box"
+            self.state = "MOVE_TO_BOX"
             self.move_to_box(box_distance, box_angle)
         else:
-            self.state = "Detect Box"  # Continue detecting
+            self.state = "DETECT_BOX"  # Continue detecting
 
     def move_to_box(self, distance, angle):
-        print("Move to Box State")
+        print("MOVE_TO_BOX State")
         if angle < -10:
             self.motion.turn_left(duration=0.1)
             print("Turn left Box")
@@ -85,24 +85,24 @@ class StateMachine:
             print("Move Forward Box")
         else:
             self.motion.stop()
-            self.state = "Lift Box"
+            self.state = "LIFT_BOX"
 
     def lift_box(self):
-        print("Lift Box state")
+        print("LIFT_BOX state")
         self.motion.lift_box()
-        self.state = "Detect Dest"
+        self.state = "DETECT_DEST"
 
     def detect_dest(self):
-        print("Detect Dest state")
+        print("DETECT_DEST state")
         dest_detected, dest_distance, dest_angle = self.vision.detect_dest()
         if dest_detected:
-            self.state = 'Move to Dest'
+            self.state = "MOVE_TO_DEST"
             self.move_to_dest(dest_distance, dest_angle)
         else:
-            self.state = "Detect Dest"
+            self.state = "DETECT_DEST"
 
     def move_to_dest(self, distance, angle):
-        print("Move to Dest state")
+        print("MOVE_TO_DEST state")
         if angle < -0.1:
             self.motion.turn_left(duration=0.1)
             print("Turn left Dest")
@@ -114,34 +114,34 @@ class StateMachine:
             print("Move forward Dest")
         else:
             self.motion.stop()
-            self.state = "Leave Box"
+            self.state = "LEAVE_BOX"
 
     def leave_box(self):
-        print("Leave Box state")
+        print("LEAVE_BOX state")
         self.motion.leave_box()
         self.state = "IDLE"
 
     def stop(self):
-        print("Stop state")
+        print("STOP state")
         self.motion.stop()
 
     def perform_state_actions(self):
         if self.state == "IDLE":
             self.idle()
-        elif self.state == "Detect Box":
+        elif self.state == "DETECT_BOX":
             self.detect_box()
-        elif self.state == "Move to Box":
-            self.detect_box()  # Move to Box state calls detect_box to get distance and angle again
-        elif self.state == "Lift Box":
+        elif self.state == "MOVE_TO_BOX":
+            self.detect_box()  # MOVE_TO_BOX state calls detect_box to get distance and angle again
+        elif self.state == "LIFT_BOX":
             self.lift_box()
-        elif self.state == "Move to Dest":
-            self.detect_dest()  # Move to Dest state calls detect_dest to get distance and angle again
-        elif self.state == "Leave Box":
+        elif self.state == "MOVE_TO_DEST":
+            self.detect_dest()  # MOVE_TO_DEST state calls detect_dest to get distance and angle again
+        elif self.state == "LEAVE_BOX":
             self.leave_box()
-        elif self.state == "Detect Dest":
+        elif self.state == "DETECT_DEST":
             self.detect_dest()
-        elif self.state == "Stop":
-            self.stop()
+        elif self.state == "STOP":
+            self.STOP()
         time.sleep(0.1)
 
 

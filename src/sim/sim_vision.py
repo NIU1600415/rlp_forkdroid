@@ -32,6 +32,6 @@ class SimVision(Vision):
     def is_arrived(self):
         _, distance, _ = self.detect_dest()
         threshold = 0.1  # Example
-        if (abs(distance - threshold)):
+        if abs(distance - threshold):
             return True
         return False

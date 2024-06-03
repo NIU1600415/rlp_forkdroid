@@ -19,4 +19,9 @@ class Vision(ABC):
 
     @abstractmethod
     def detect_dest(self):
-        """Check if the robot has arrived to the target."""
+        raise NotImplementedError(
+            "This method should be overridden by subclasses")
+
+    def is_arrived(self):
+        raise NotImplementedError(
+            "This method should be overridden by subclasses")
