@@ -36,6 +36,9 @@ def remove_unconnected_components_third_step(cleaned_mask_data):
     _, labels, stats, _ = cv2.connectedComponentsWithStats(
         binary_mask, connectivity=8)
 
+    if len(stats) <= 1:
+        return cleaned_mask_data
+
     # Find the component with the largest area, skip the background
     largest_label = 1 + np.argmax(stats[1:, cv2.CC_STAT_AREA])
 
