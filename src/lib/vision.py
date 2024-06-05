@@ -19,5 +19,5 @@ class Vision(ABC):
     def detect_dest(self):
         raise NotImplementedError("This method should be overridden by subclasses")
 
-    def is_arrived(self):
+    def has_arrived(self):
         raise NotImplementedError("This method should be overridden by subclasses")

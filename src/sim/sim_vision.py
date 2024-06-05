@@ -1,5 +1,13 @@
 from numpy import frombuffer, flipud, uint8
 from lib.vision import Vision
+from vision_processing.vision_processing import (
+    analyze_frame_for_target_object,
+    analyze_frame_for_destination,
+)
+from vision_processing.vision_processing import (
+    TargetAnalysisResult,
+    DestinationAnalysisResult,
+)
 
 
 class SimVision(Vision):
@@ -7,7 +15,7 @@ class SimVision(Vision):
 
     def __init__(self, sim):
         self.sim = sim
-        self.camera_handle = sim.getObject("/Vision_sensor")
+        self.camera_handle = sim.getObject("/RobotnikSummitXL/Vision_sensor")
 
     def get_frame(self):
         image, resolution = self.sim.getVisionSensorImg(self.camera_handle)
@@ -17,21 +25,17 @@ class SimVision(Vision):
         frame = flipud(frame)
         return frame
 
-    def detect_box(self):
-        box_detected = True
-        box_distance = 2.0
-        box_angle = 5.0
-        return box_detected, box_distance, box_angle
+    def detect_target(self) -> TargetAnalysisResult:
+        frame = self.get_frame()
+        analysis_result = analyze_frame_for_target_object(frame, debug=True)
+        return analysis_result
 
-    def detect_dest(self):
-        dest_detected = True
-        dest_distance = 2.0
-        dest_angle = -45.0
-        return dest_detected, dest_distance, dest_angle
+    def detect_dest(self) -> DestinationAnalysisResult:
+        frame = self.get_frame()
+        analysis_result = analyze_frame_for_destination(frame, debug=True)
+        return analysis_result
 
-    def is_arrived(self):
-        _, distance, _ = self.detect_dest()
+    def has_arrived(self):
+        analysis_result = self.detect_dest()
         threshold = 0.1  # Example
-        if abs(distance - threshold):
-            return True
-        return False
+        return analysis_result["destination_distance"] < threshold

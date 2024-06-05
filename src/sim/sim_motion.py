@@ -62,5 +62,5 @@ class SimMotion(Motion):
     def lift_box(self):
         pass
 
-    def leave_box(self):
+    def place_box(self):
         pass
