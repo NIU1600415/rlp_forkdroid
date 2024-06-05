@@ -5,22 +5,22 @@ class Motion(ABC):
     """Abstract base class for robot."""
 
     @abstractmethod
-    def move_forward(self):
+    def move_forward(self, duration):
         """Move the robot forward."""
         raise NotImplementedError("This method should be overridden by subclasses")
 
     @abstractmethod
-    def move_backward(self):
+    def move_backward(self, duration):
         """Move the robot backward."""
         raise NotImplementedError("This method should be overridden by subclasses")
 
     @abstractmethod
-    def turn_left(self):
+    def turn_left(self, duration):
         """Turn the robot left."""
         raise NotImplementedError("This method should be overridden by subclasses")
 
     @abstractmethod
-    def turn_right(self):
+    def turn_right(self, duration):
         """Turn the robot right."""
         raise NotImplementedError("This method should be overridden by subclasses")
 
@@ -30,11 +30,11 @@ class Motion(ABC):
         raise NotImplementedError("This method should be overridden by subclasses")
 
     @abstractmethod
-    def lift_box(self):
-        """Lift the box."""
+    def lift_target(self):
+        """Lift the target."""
         raise NotImplementedError("This method should be overridden by subclasses")
 
     @abstractmethod
-    def leave_box(self):
-        """Leave the box at the destination."""
+    def place_target(self):
+        """Place the target."""
         raise NotImplementedError("This method should be overridden by subclasses")
