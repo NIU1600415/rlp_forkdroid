@@ -12,7 +12,7 @@ class Vision(ABC):
         raise NotImplementedError("This method should be overridden by subclasses")
 
     @abstractmethod
-    def detect_box(self):
+    def detect_target(self):
         raise NotImplementedError("This method should be overridden by subclasses")
 
     @abstractmethod
