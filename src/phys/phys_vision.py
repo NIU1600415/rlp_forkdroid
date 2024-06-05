@@ -9,3 +9,12 @@ class PhysVision(Vision):
 
     def get_frame(self):
         pass
+
+    def detect_target(self):
+        pass
+
+    def detect_dest(self):
+        pass
+
+    def has_arrived(self):
+        pass

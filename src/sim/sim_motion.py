@@ -59,8 +59,8 @@ class SimMotion(Motion):
         self.sim.setJointTargetVelocity(self.br_handle, 0)
         self.sim.setJointTargetVelocity(self.fr_handle, 0)
 
-    def lift_box(self):
-        pass
+    def lift_target(self):
+        print("LIFT TARGET")
 
-    def place_box(self):
-        pass
+    def place_target(self):
+        print("PLACE TARGET")

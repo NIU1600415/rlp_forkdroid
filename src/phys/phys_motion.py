@@ -7,17 +7,23 @@ class PhysMotion(Motion):
     def __init__(self):
         """TODO"""
 
-    def move_forward(self):
+    def move_forward(self, duration):
         pass
 
-    def move_backward(self):
+    def move_backward(self, duration):
         pass
 
-    def turn_left(self):
+    def turn_left(self, duration):
         pass
 
-    def turn_right(self):
+    def turn_right(self, duration):
         pass
 
     def stop(self):
+        pass
+
+    def lift_target(self):
+        pass
+
+    def place_target(self):
         pass
