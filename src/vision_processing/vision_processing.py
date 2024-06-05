@@ -260,8 +260,8 @@ class TargetAnalysisResult(TypedDict):
     the value is `-45`, left is `45`, and anything in between."""
 
 
-LOWER_RED_HSV = np.array([150, 44, 80])
-UPPER_RED_HSV = np.array([185, 255, 255])
+LOWER_RED_HSV = np.array([0, 100, 100])
+UPPER_RED_HSV = np.array([200, 255, 255])
 TARGET_DIST_MAGIC_NUMBER = 100
 
 
