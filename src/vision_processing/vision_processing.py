@@ -29,12 +29,10 @@ def clean_mask_second_step(mask_data):
 
 def remove_unconnected_components_third_step(cleaned_mask_data):
     # Threshold the mask if necessary (this will ensure binary mask)
-    _, binary_mask = cv2.threshold(
-        cleaned_mask_data, 127, 255, cv2.THRESH_BINARY)
+    _, binary_mask = cv2.threshold(cleaned_mask_data, 127, 255, cv2.THRESH_BINARY)
 
     # Perform connected components analysis
-    _, labels, stats, _ = cv2.connectedComponentsWithStats(
-        binary_mask, connectivity=8)
+    _, labels, stats, _ = cv2.connectedComponentsWithStats(binary_mask, connectivity=8)
 
     if len(stats) <= 1:
         return cleaned_mask_data
@@ -55,7 +53,8 @@ def get_mask_frame_fourth_step(final_mask):
 
     # Find contours
     contours, _ = cv2.findContours(
-        binary_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        binary_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+    )
 
     if len(contours) == 0:  # No target found
         return False, ((0, 0), (0, 0)), (0, 0)
@@ -82,7 +81,9 @@ def get_mask_frame_fourth_step(final_mask):
     return True, ((x_new, y_new), (x_new + w_new, y_new + h_new)), (x_center, y_center)
 
 
-def should_continue_given_relative_frame_size_fifth_step(full_image, target_xy_1, target_xy_2):
+def should_continue_given_relative_frame_size_fifth_step(
+    full_image, target_xy_1, target_xy_2
+):
     # if target frame is 50% or more of image size in pixels, don't continue
     percentage_threshold = 50
 
@@ -94,7 +95,10 @@ def should_continue_given_relative_frame_size_fifth_step(full_image, target_xy_1
     bounding_rect_area = w * h
 
     percentage_covered_by_frame = (bounding_rect_area / full_pixels) * 100
-    return (percentage_covered_by_frame < percentage_threshold, percentage_covered_by_frame)
+    return (
+        percentage_covered_by_frame < percentage_threshold,
+        percentage_covered_by_frame,
+    )
 
 
 def get_lateral_position_offset_sixth_step(target_center_xy, frame):
@@ -113,8 +117,7 @@ def get_distance_seventh_step(mask, magic_number):
 
 
 def get_contour_from_mask_seventh_step(mask):
-    contours, _ = cv2.findContours(
-        mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     largest_contour = max(contours, key=cv2.contourArea)
 
     num_vertices = 999
@@ -163,12 +166,19 @@ def get_facing_from_contour_eighth_step(contour_vertices):
         start_vertex_j = contour_vertices[j]
         end_vertex_j = contour_vertices[(j + 1) % len(contour_vertices)]
         direction_vector_j = end_vertex_j - start_vertex_j
-        l_j = side_length(start_vertex_j, end_vertex_j, )
+        l_j = side_length(
+            start_vertex_j,
+            end_vertex_j,
+        )
         if l_i + l_j < shortest_parallel_side_l:
             shortest_parallel_side_index = index
             shortest_parallel_side_l = l_i + l_j
         contour_parallel_angles.append(
-            (angle_with_x_axis(direction_vector_i), angle_with_x_axis(direction_vector_j)))
+            (
+                angle_with_x_axis(direction_vector_i),
+                angle_with_x_axis(direction_vector_j),
+            )
+        )
 
     a1, a2 = contour_parallel_angles[shortest_parallel_side_index]
     return facing_from_short_angle_pair(a1, a2)
@@ -191,10 +201,10 @@ def get_rotation_from_contour_facing_ninth_step(contour_vertices, facing):
         return (most_left, most_right)
 
     def normalized_width_from_x_vertex_extremes(most_left, most_right):
-        all_vertices = [most_left[0], most_left[1],
-                        most_right[0], most_right[1]]
+        all_vertices = [most_left[0], most_left[1], most_right[0], most_right[1]]
         sorted_vertices = sorted(
-            all_vertices, key=lambda vertex: vertex[1], reverse=True)
+            all_vertices, key=lambda vertex: vertex[1], reverse=True
+        )
         highest_y_vertices = sorted_vertices[:2]
         norm_width = abs(highest_y_vertices[0][0] - highest_y_vertices[1][0])
         return norm_width
@@ -270,8 +280,7 @@ def analyze_frame_for_target_object(frame, debug=False) -> TargetAnalysisResult:
     mask = masking_first_step(frame, LOWER_RED_HSV, UPPER_RED_HSV)
     clean_mask = clean_mask_second_step(mask)
     final_mask = remove_unconnected_components_third_step(clean_mask)
-    found_frame, target_frame, frame_center_xy = get_mask_frame_fourth_step(
-        final_mask)
+    found_frame, target_frame, frame_center_xy = get_mask_frame_fourth_step(final_mask)
     if not found_frame:
         if debug:
             write_debug_frame(frame, target_frame, ["Looking for target"])
@@ -281,11 +290,14 @@ def analyze_frame_for_target_object(frame, debug=False) -> TargetAnalysisResult:
             "target_too_close": False,
             "target_frame_lateral_position_offset": 0,
             "target_rotation": 0,
-            "target_distance": 0
+            "target_distance": 0,
         }
     target_xy_1, target_xy_2 = target_frame
-    should_continue, size_percentage = should_continue_given_relative_frame_size_fifth_step(
-        frame, target_xy_1, target_xy_2)
+    should_continue, size_percentage = (
+        should_continue_given_relative_frame_size_fifth_step(
+            frame, target_xy_1, target_xy_2
+        )
+    )
     if not should_continue:
         if debug:
             write_debug_frame(frame, target_frame, ["Target too large"])
@@ -295,7 +307,7 @@ def analyze_frame_for_target_object(frame, debug=False) -> TargetAnalysisResult:
             "target_too_close": True,
             "target_frame_lateral_position_offset": 0,
             "target_rotation": 0,
-            "target_distance": 0
+            "target_distance": 0,
         }
     target_lateral_offset = get_lateral_position_offset_sixth_step(
         frame_center_xy, frame
@@ -305,12 +317,18 @@ def analyze_frame_for_target_object(frame, debug=False) -> TargetAnalysisResult:
     target_contour = get_contour_from_mask_seventh_step(final_mask)
     target_facing = get_facing_from_contour_eighth_step(target_contour)
     target_rotation = get_rotation_from_contour_facing_ninth_step(
-        target_contour, target_facing)
+        target_contour, target_facing
+    )
     if debug:
-        write_debug_frame(frame, target_frame, [f"Distance: {target_distance:.2f}cm",
-                                                f"Rotation: {
-                                                    target_rotation:.2f}deg",
-                                                f"Center offset: {target_lateral_offset:.2f}"])
+        write_debug_frame(
+            frame,
+            target_frame,
+            [
+                f"Distance: {target_distance:.2f}cm",
+                f"Rotation: {target_rotation:.2f}deg",
+                f"Center offset: {target_lateral_offset:.2f}",
+            ],
+        )
     return {
         "target_detected": True,
         "target_size_percentage": size_percentage,
@@ -343,8 +361,7 @@ def analyze_frame_for_destination(frame, debug=False) -> DestinationAnalysisResu
     mask = masking_first_step(frame, LOWER_YELLOW_HSV, UPPER_YELLOW_HSV)
     clean_mask = clean_mask_second_step(mask)
     final_mask = remove_unconnected_components_third_step(clean_mask)
-    found_frame, target_frame, frame_center_xy = get_mask_frame_fourth_step(
-        final_mask)
+    found_frame, target_frame, frame_center_xy = get_mask_frame_fourth_step(final_mask)
     if not found_frame:
         if debug:
             write_debug_frame(frame, target_frame, ["Looking for destination"])
@@ -354,14 +371,19 @@ def analyze_frame_for_destination(frame, debug=False) -> DestinationAnalysisResu
             "destination_frame_lateral_position_offset": 0,
         }
     destionation_lateral_offset = get_lateral_position_offset_sixth_step(
-        frame_center_xy, frame)
-    destination_distance = get_distance_seventh_step(final_mask, DESTINATION_DIST_MAGIC_NUMBER)
+        frame_center_xy, frame
+    )
+    destination_distance = get_distance_seventh_step(
+        final_mask, DESTINATION_DIST_MAGIC_NUMBER
+    )
     if debug:
         write_debug_frame(
             frame,
             target_frame,
-            [f"Destination distance: {destination_distance:.2f}cm",
-             f"Center offset: {destionation_lateral_offset:.2f}"],
+            [
+                f"Destination distance: {destination_distance:.2f}cm",
+                f"Center offset: {destionation_lateral_offset:.2f}",
+            ],
         )
     return {
         "destination_detected": True,
