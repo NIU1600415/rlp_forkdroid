@@ -34,8 +34,6 @@ class SimVision(Vision):
         frame = self.get_frame()
         analysis_result = analyze_frame_for_destination(frame, debug=True)
         return analysis_result
+    
 
-    def has_arrived(self):
-        analysis_result = self.detect_dest()
-        threshold = 0.1  # Example
-        return analysis_result["destination_distance"] < threshold
+
