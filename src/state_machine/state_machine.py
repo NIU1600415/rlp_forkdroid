@@ -22,8 +22,11 @@ class StateMachine:
         self.calibrated: bool = False
         self.calibration_target: CalibrationData
         self.calibration_dest: CalibrationData
-        self.time_for_90_deg = 1.4
-        self.time_for_velocity_calc = 8
+        self.time_for_90_deg = 2
+        self.velocity_for_time_calc = 4.2
+        self.arrival_threshold_box = 2
+        self.arrival_threshold_dest = 6
+        self.forward_one_step_time = 1
 
     def begin(self):
         while True:
@@ -70,7 +73,7 @@ class StateMachine:
 
     def detect_box(self):
         print("DETECT_BOX state")
-        analysis_result = self.vision.detect_box()
+        analysis_result = self.vision.detect_target()
         if analysis_result["target_detected"]:
             print(
                 "BOX DETECTED : ",
@@ -82,29 +85,32 @@ class StateMachine:
                 analysis_result["target_distance"], analysis_result["target_rotation"]
             )
         else:
-            print("BOX NOT DETECTED YET")
+            self.motion.turn_right(duration = 1)
+            print("Rotating to scan for box")
+            time.sleep(0.1)
             self.state = "DETECT_BOX"  # Continue detecting
 
     def move_to_box(self, distance, angle):
         print("MOVE_TO_BOX State")
-        if angle < 0:
-            distance_vertical = distance * math.sin(math.radians(abs(angle)))
-            time_left = distance_vertical / self.time_for_velocity_calc
+        distance_vertical = distance * math.sin(math.radians(abs(angle)))
+        if angle < -0.1:
+            time_vertical_move = distance_vertical / self.velocity_for_time_calc
             self.motion.turn_left(duration=self.time_for_90_deg)
-            self.motion.move_forward(duration=time_left)
+            self.motion.move_forward(duration=time_vertical_move)
             self.motion.turn_right(duration=self.time_for_90_deg)
-            print("Turn left Box")
-        elif angle > 0:
-            distance_vertical = distance * math.sin(math.radians(abs(angle)))
-            time_left = distance_vertical / self.time_for_velocity_calc
+            print("Turn vertical_move Box")
+        elif angle > 0.1:
+            time_vertical_move = distance_vertical / self.velocity_for_time_calc
             self.motion.turn_right(duration=self.time_for_90_deg)
-            self.motion.move_forward(duration=time_left)
+            self.motion.move_forward(duration=time_vertical_move)
             self.motion.turn_left(duration=self.time_for_90_deg)
             print("Turn right Box")
-        elif distance > 5:
-            self.motion.move_forward(duration=0.5)
+        elif distance > self.arrival_threshold_box:
+            # time_to_target = distance / self.velocity_for_time_calc
+            # self.motion.move_forward(duration=time_to_target)
+            self.motion.move_forward(duration = self.forward_one_step_time)
             print("Move Forward Box")
-        else:
+        elif distance < self.arrival_threshold_box:
             self.motion.stop()
             self.state = "LIFT_BOX"
 
@@ -116,26 +122,47 @@ class StateMachine:
     def detect_dest(self):
         print("DETECT_DEST state")
         analysis_result = self.vision.detect_dest()
+        
         if analysis_result["destination_detected"]:
+            print(
+                "DEST. DETECTED : ",
+                analysis_result["destination_distance"],
+                analysis_result["destination_frame_lateral_position_offset"]
+            )
             self.state = "MOVE_TO_DEST"
             self.move_to_dest(
-                analysis_result["destination_distance"], 0
+                analysis_result["destination_distance"], analysis_result["destination_frame_lateral_position_offset"]
             )  # Angle not provided
         else:
+            self.motion.turn_right(duration = 1)
+            print("Rotating to scan for dest.")
+            time.sleep(0.1)
             self.state = "DETECT_DEST"
 
-    def move_to_dest(self, distance, angle):
-        print("MOVE_TO_DEST state")
-        if angle < -0.1:
-            self.motion.turn_left(duration=0.1)
+    def move_to_dest(self, distance, offset):
+        frame_width = 1920
+        pixel_offset = offset * (frame_width / 2)
+        angle_per_pixel = 60 / frame_width
+        angle = pixel_offset * angle_per_pixel
+        distance_vertical = distance * math.sin(math.radians(abs(angle)))
+        if offset < -0.2:
+            time_vertical_move = distance_vertical / self.velocity_for_time_calc
+            self.motion.turn_left(duration=self.time_for_90_deg)
+            self.motion.move_forward(duration=time_vertical_move)
+            self.motion.turn_right(duration=self.time_for_90_deg)
             print("Turn left Dest")
-        elif angle > 0.1:
-            self.motion.turn_right(duration=0.1)
+        elif offset > 0.2:
+            time_vertical_move = distance_vertical / self.velocity_for_time_calc
+            self.motion.turn_right(duration=self.time_for_90_deg)
+            self.motion.move_forward(duration=time_vertical_move)
+            self.motion.turn_left(duration=self.time_for_90_deg)
             print("Turn right Dest")
-        elif distance > 0.1:
-            self.motion.move_forward(duration=0.1)
-            print("Move forward Dest")
-        else:
+        elif distance > self.arrival_threshold_dest:
+            #time_to_dest = distance / selloc
+            #self.motion.move_forward(duration=time_to_dest)
+            self.motion.move_forward(duration=self.forward_one_step_time)
+            print("Move Forward Dest")
+        elif distance < self.arrival_threshold_dest:
             self.motion.stop()
             self.state = "LEAVE_BOX"
 

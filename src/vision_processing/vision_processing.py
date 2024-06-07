@@ -263,9 +263,11 @@ class TargetAnalysisResult(TypedDict):
     the value is `-45`, left is `45`, and anything in between."""
 
 
+# LOWER_RED_HSV = np.array([0, 100, 100])
+# UPPER_RED_HSV = np.array([200, 255, 255])
 LOWER_RED_HSV = np.array([0, 100, 100])
-UPPER_RED_HSV = np.array([200, 255, 255])
-TARGET_DIST_MAGIC_NUMBER = 640
+UPPER_RED_HSV = np.array([10, 255, 255])
+TARGET_DIST_MAGIC_NUMBER = 503
 
 
 def analyze_frame_for_target_object(frame, debug=False) -> TargetAnalysisResult:
@@ -361,8 +363,11 @@ class DestinationAnalysisResult(TypedDict):
     of the frame, `-1` is the left-most position, and `1` is the right-most position."""
 
 
-LOWER_YELLOW_HSV = np.array([10, 100, 100])
-UPPER_YELLOW_HSV = np.array([45, 255, 255])
+# LOWER_YELLOW_HSV = np.array([10, 100, 100])
+# UPPER_YELLOW_HSV = np.array([45, 255, 255])
+
+LOWER_YELLOW_HSV = np.array([20, 100, 100])
+UPPER_YELLOW_HSV = np.array([30, 255, 255])
 DESTINATION_DIST_MAGIC_NUMBER = 580
 
 
