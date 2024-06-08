@@ -14,7 +14,7 @@ export interface State {
   };
 }
 
-type MachineCommand = "CALIB_DATA_TARGET" | "CALIB_DATA_DESTINATION";
+type MachineCommand = "CALIB_DATA_TARGET" | "CALIB_DATA_DESTINATION" | "START_MACHINE" | "STOP_MACHINE";
 
 const machineApi = {
   getState: () => Api.get<State>("/state"),

@@ -5,7 +5,12 @@ import { StateService } from '../service/stateService';
 export default async function queueController(fastify: FastifyInstance) {
   const stateService = new StateService();
 
-  const MessageTypes = Type.Union([Type.Literal('CALIB_DATA_TARGET'), Type.Literal('CALIB_DATA_DESTINATION')]);
+  const MessageTypes = Type.Union([
+    Type.Literal('CALIB_DATA_TARGET'), 
+    Type.Literal('CALIB_DATA_DESTINATION'),
+    Type.Literal('START_MACHINE'),  
+    Type.Literal('STOP_MACHINE')    
+  ]);
 
   const CalibrationData = Type.Object({
     upper: Type.String(),
@@ -45,7 +50,12 @@ export default async function queueController(fastify: FastifyInstance) {
   );
 
   const GetQueueMessageReply = Type.Object({
-    type: Type.Union([Type.Literal('CALIBRATE_TARGET'), Type.Literal('CALIBRATE_DESTINATION')]),
+    type: Type.Union([
+      Type.Literal('CALIBRATE_TARGET'), 
+      Type.Literal('CALIBRATE_DESTINATION'),
+      Type.Literal('START_MACHINE'),  
+      Type.Literal('STOP_MACHINE')    
+    ]),
     data: Type.Union([Type.Null(), Type.Number()]),
   });
 

@@ -12,16 +12,16 @@ interface State {
   };
 }
 
-type StateCommand = 'CALIB_DATA_TARGET' | 'CALIB_DATA_DESTINATION'; // TODO
+type StateCommand = 'CALIB_DATA_TARGET' | 'CALIB_DATA_DESTINATION' | "START_MACHINE" | "STOP_MACHINE"; // TODO
 
-type MessageFromMachineTypes = 'CALIB_DATA_TARGET' | 'CALIB_DATA_DESTINATION'; // TODO
+type MessageFromMachineTypes = 'CALIB_DATA_TARGET' | 'CALIB_DATA_DESTINATION' | "START_MACHINE" | "STOP_MACHINE"; // TODO
 
 interface MessageFromMachine {
   type: MessageFromMachineTypes;
   data: CalibrationData;
 }
 
-type MessageToMachineTypes = 'CALIBRATE_TARGET' | 'CALIBRATE_DESTINATION'; // TODO
+type MessageToMachineTypes = 'CALIBRATE_TARGET' | 'CALIBRATE_DESTINATION' | "START_MACHINE" | "STOP_MACHINE"; // TODO
 
 interface MessageToMachine {
   type: MessageToMachineTypes;
@@ -70,6 +70,17 @@ export class StateService {
       });
 
       this.state.calibrated = false;
+    } else if (command === 'START_MACHINE'){
+      this.messagesToMachineFIFO.push({
+        type: 'START_MACHINE',
+        data: null,
+      });
+    } else if (command === 'STOP_MACHINE'){
+      this.messagesToMachineFIFO.push({
+        type: 'STOP_MACHINE',
+        data: null,
+      });
+      this.state.machine_state='IDLE';
     }
   }
 
@@ -80,8 +91,11 @@ export class StateService {
       this.state.calibration_data.target = message.data;
     } else if (message.type === 'CALIB_DATA_DESTINATION') {
       this.state.calibration_data.destination = message.data;
+    }  else if (message.type === 'START_MACHINE') {
+      this.state.machine_state = 'RUNNING';
+    } else if (message.type === 'STOP_MACHINE') {
+      this.state.machine_state = 'IDLE';
     }
-
     if (
       this.state.calibration_data.destination.lower !== '#FFFFFF' &&
       this.state.calibration_data.target.lower !== '#FFFFFF'

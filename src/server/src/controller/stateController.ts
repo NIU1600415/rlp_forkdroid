@@ -6,7 +6,12 @@ export default async function stateController(fastify: FastifyInstance) {
   const stateService = new StateService();
 
   const CommandBody = Type.Object({
-    command: Type.Union([Type.Literal('CALIB_DATA_TARGET'), Type.Literal('CALIB_DATA_DESTINATION')]),
+    command: Type.Union([
+      Type.Literal('CALIB_DATA_TARGET'), 
+      Type.Literal('CALIB_DATA_DESTINATION'),
+      Type.Literal('START_MACHINE'), 
+      Type.Literal('STOP_MACHINE')
+    ]),
   });
 
   type CommandBodyType = Static<typeof CommandBody>;
