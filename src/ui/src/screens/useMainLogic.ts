@@ -10,9 +10,13 @@ export default function useMainLogic() {
 
   const requestTargetCalibration = () =>
     machineApi.sendCommand("CALIB_DATA_TARGET");
+  const requestMachineStart = () => machineApi.sendCommand("START_MACHINE");
+  const requestMachineStop = () => machineApi.sendCommand("STOP_MACHINE");
 
   return {
     state: machineState,
     requestTargetCalibration,
+    requestMachineStart,
+    requestMachineStop,
   };
 }

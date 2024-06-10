@@ -5,7 +5,12 @@ import Header from "../components/Header";
 import useMainLogic from "./useMainLogic";
 
 export default function Main() {
-  const { state, requestTargetCalibration } = useMainLogic();
+  const {
+    state,
+    requestTargetCalibration,
+    requestMachineStart,
+    requestMachineStop,
+  } = useMainLogic();
 
   return (
     <>
@@ -14,6 +19,8 @@ export default function Main() {
         <Box sx={{ my: 4 }}>
           <p>{JSON.stringify(state || "LOADING...")}</p>
           <Button onClick={requestTargetCalibration}>Calibrate target</Button>
+          <Button onClick={requestMachineStart}>Start</Button>
+          <Button onClick={requestMachineStop}>Stop</Button>
         </Box>
       </Container>
     </>
