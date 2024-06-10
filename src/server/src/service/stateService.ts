@@ -4,7 +4,7 @@ interface CalibrationData {
 }
 
 interface State {
-  machine_state: 'IDLE' | 'CALIBRATING' | 'RUNNING'; // TODO
+  machine_state: 'IDLE' | 'CALIBRATING' | 'RUNNING';
   calibrated: boolean;
   calibration_data: {
     target: CalibrationData;
@@ -12,16 +12,16 @@ interface State {
   };
 }
 
-type StateCommand = 'CALIB_DATA_TARGET' | 'CALIB_DATA_DESTINATION' | "START_MACHINE" | "STOP_MACHINE"; // TODO
+type StateCommand = 'CALIB_DATA_TARGET' | 'CALIB_DATA_DESTINATION' | 'START_MACHINE' | 'STOP_MACHINE';
 
-type MessageFromMachineTypes = 'CALIB_DATA_TARGET' | 'CALIB_DATA_DESTINATION' | "START_MACHINE" | "STOP_MACHINE"; // TODO
+type MessageFromMachineTypes = 'CALIB_DATA_TARGET' | 'CALIB_DATA_DESTINATION' | 'START_MACHINE' | 'STOP_MACHINE';
 
 interface MessageFromMachine {
   type: MessageFromMachineTypes;
   data: CalibrationData;
 }
 
-type MessageToMachineTypes = 'CALIBRATE_TARGET' | 'CALIBRATE_DESTINATION' | "START_MACHINE" | "STOP_MACHINE"; // TODO
+type MessageToMachineTypes = 'CALIBRATE_TARGET' | 'CALIBRATE_DESTINATION' | 'START_MACHINE' | 'STOP_MACHINE';
 
 interface MessageToMachine {
   type: MessageToMachineTypes;
@@ -70,17 +70,17 @@ export class StateService {
       });
 
       this.state.calibrated = false;
-    } else if (command === 'START_MACHINE'){
+    } else if (command === 'START_MACHINE') {
       this.messagesToMachineFIFO.push({
         type: 'START_MACHINE',
         data: null,
       });
-    } else if (command === 'STOP_MACHINE'){
+    } else if (command === 'STOP_MACHINE') {
       this.messagesToMachineFIFO.push({
         type: 'STOP_MACHINE',
         data: null,
       });
-      this.state.machine_state='IDLE';
+      this.state.machine_state = 'IDLE';
     }
   }
 
@@ -91,7 +91,7 @@ export class StateService {
       this.state.calibration_data.target = message.data;
     } else if (message.type === 'CALIB_DATA_DESTINATION') {
       this.state.calibration_data.destination = message.data;
-    }  else if (message.type === 'START_MACHINE') {
+    } else if (message.type === 'START_MACHINE') {
       this.state.machine_state = 'RUNNING';
     } else if (message.type === 'STOP_MACHINE') {
       this.state.machine_state = 'IDLE';

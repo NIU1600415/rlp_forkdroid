@@ -5,7 +5,12 @@ import Header from "../components/Header";
 import useMainLogic from "./useMainLogic";
 
 export default function Main() {
-  const { state, requestTargetCalibration, requestMachineStart, requestMachineStop } = useMainLogic();
+  const {
+    state,
+    requestTargetCalibration,
+    requestMachineStart,
+    requestMachineStop,
+  } = useMainLogic();
 
   return (
     <>

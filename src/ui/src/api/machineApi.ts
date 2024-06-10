@@ -6,7 +6,7 @@ interface CalibrationData {
 }
 
 export interface State {
-  machine_state: "IDLE" | "CALIBRATING" | "RUNNING"; // TODO
+  machine_state: "IDLE" | "CALIBRATING" | "RUNNING";
   calibrated: boolean;
   calibration_data: {
     target: CalibrationData;
@@ -14,7 +14,11 @@ export interface State {
   };
 }
 
-type MachineCommand = "CALIB_DATA_TARGET" | "CALIB_DATA_DESTINATION" | "START_MACHINE" | "STOP_MACHINE";
+type MachineCommand =
+  | "CALIB_DATA_TARGET"
+  | "CALIB_DATA_DESTINATION"
+  | "START_MACHINE"
+  | "STOP_MACHINE";
 
 const machineApi = {
   getState: () => Api.get<State>("/state"),
