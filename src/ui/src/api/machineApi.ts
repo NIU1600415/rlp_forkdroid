@@ -6,7 +6,7 @@ interface CalibrationData {
 }
 
 export interface State {
-  machine_state: "IDLE" | "CALIBRATING" | "RUNNING";
+  machine_state: "IDLE" | "CALIBRATING" | "RUNNING" | "STOPPED";
   calibrated: boolean;
   calibration_data: {
     target: CalibrationData;
