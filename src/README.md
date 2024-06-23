@@ -1,3 +1,5 @@
+![Software diagram](../assets/software_diagram.jpg)
+
 ### Before running machine
 
 `$ cd ui && yarn && yarn build && cd ..`

@@ -7,9 +7,15 @@ Automated forklift with machine vision.
 This repository tracks the development of Forkdroid, a machine-vision powered robot which automates moving materials over short distances.
 The Forkdroid prototype is a small-form robot actuated by SG90 servomotors with a Raspberry Pi Zero & Pi Camera.
 
+![Forkdroid in action](https://github.com/NIU1600415/rlp_forkdroid/blob/main/assets/animated.gif)
+
 #### Assembled prototype
 
+![Assembled prototype](https://github.com/NIU1600415/rlp_forkdroid/blob/main/assets/physical_assembled.jpg)
+
 #### Vision processing using OpenCV
+
+![Forkdroid vision processing](https://github.com/NIU1600415/rlp_forkdroid/blob/main/assets/vision_processing.jpg)
 
 ## Repository structure
 
@@ -40,6 +46,8 @@ See `etc/`
 [TODO.md](https://github.com/NIU1600415/rlp_forkdroid/blob/main/TODO.md)
 
 ## Software
+
+![Software diagram](https://github.com/NIU1600415/rlp_forkdroid/blob/main/assets/software_diagram.jpg)
 
 ### Requirements
 
@@ -72,6 +80,8 @@ The hardware used on the prototype robot is the following:
 - x4 2400mAh NiMh batteries, AA form-factor.
 - LM2596 DC-DC buck converter (Pi power source)
 - Toggle switch
+
+![Hardware schematic](https://github.com/NIU1600415/rlp_forkdroid/blob/main/assets/schematic.png)
 
 ## Modelling
 
