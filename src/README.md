@@ -1,5 +1,7 @@
 ![Software diagram](../assets/software_diagram.jpg)
 
+![State machine](../assets/state_machine.png)
+
 ### Before running machine
 
 `$ cd ui && yarn && yarn build && cd ..`
