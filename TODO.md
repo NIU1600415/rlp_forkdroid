@@ -15,6 +15,6 @@
   - [x] Web user interface, communication with API
 - [x] Robot assembly
 - [x] Robot simulation in CoppeliaSim with developed software package
-- [ ] Demo video
-- [ ] Update README
-- [ ] Final report, presentation
+- [x] Demo video
+- [x] Update README
+- [x] Final report, presentation
